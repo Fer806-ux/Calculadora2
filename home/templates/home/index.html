@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Raíces</title>
+    
+    <!-- Fondo llamativo, animado, con patrones y modo oscuro -->
+    <style>
+        :root {
+            --bg-light: #f0f2f5;
+            --bg-dark: #1c1c1e;
+            --text-light: #1a1a1a;
+            --text-dark: #e5e5e5;
+            --card-light: #fff;
+            --card-dark: #2c2c2e;
+            --border-light: #ccc;
+            --border-dark: #444;
+            --accent: #007bff;
+            --accent-dark: #66b0ff;
+        }
+
+        /* Fondo pastel degradado animado */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(-45deg, #fceabb, #e0c3fc, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: fondoAnimado 20s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-light);
+        }
+
+        @keyframes fondoAnimado {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle 10px, rgba(255,255,255,0.2) 20%, transparent 80%),
+                radial-gradient(circle 15px, rgba(255,255,255,0.1) 10%, transparent 90%);
+            background-size: 100px 100px;
+            animation: moverPatron 30s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes moverPatron {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50px, -50px); }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(-45deg, #1e1e2f, #2c3e50, #3a3d4f, #1e2b3a);
+                color: var(--text-dark);
+            }
+
+            body::before {
+                background-image:
+                    radial-gradient(circle 10px, rgba(255,255,255,0.05) 20%, transparent 80%),
+                    radial-gradient(circle 15px, rgba(255,255,255,0.03) 10%, transparent 90%);
+            }
+
+            .container {
+                background-color: var(--card-dark);
+                color: var(--text-dark);
+                border-color: var(--border-dark);
+            }
+
+            input, select, button {
+                background-color: #1f1f1f;
+                color: var(--text-dark);
+                border-color: var(--border-dark);
+            }
+
+            th {
+                background-color: #333;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 800px;
+            margin: 40px 20px;
+            padding: 30px;
+            background-color: var(--card-light);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 15px 0 5px;
+            font-weight: 600;
+        }
+
+        input, select, button {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        button {
+            margin-top: 20px;
+            background-color: var(--accent);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-dark);
+        }
+
+        .campo-grupo {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .campo-grupo input {
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-light);
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        img {
+            margin-top: 25px;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        hr {
+            margin: 40px 0;
+            border: none;
+            height: 1px;
+            background-color: var(--border-light);
+        }
+
+        @media (max-width: 600px) {
+            .campo-grupo {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de raíces de funciones</h1>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="funcion">Función:</label>
+            <input type="text" name="funcion" placeholder="Ej: x**3 - 2*x + 1" value="{{ funcion }}" required>
+
+            <label for="metodo">Método:</label>
+            <select name="metodo" id="metodo" onchange="mostrarCampos()">
+                <option value="biseccion" {% if metodo == 'biseccion' %}selected{% endif %}>Bisección</option>
+                <option value="newton" {% if metodo == 'newton' %}selected{% endif %}>Newton-Raphson</option>
+                <option value="newton_modificado" {% if metodo == 'newton_modificado' %}selected{% endif %}>Newton-Raphson Modificado</option>
+            </select>
+
+            <div id="campo_a_b">
+                <label>Intervalo [a, b]:</label>
+                <div class="campo-grupo">
+                    <input type="number" step="any" name="a" placeholder="a" value="{{ a }}">
+                    <input type="number" step="any" name="b" placeholder="b" value="{{ b }}">
+                </div>
+            </div>
+
+            <div id="campo_x0" style="display:none;">
+                <label>x₀ (valor inicial):</label>
+                <input type="number" step="any" name="x0" value="{{ x0 }}">
+            </div>
+
+            <label for="tol">Tolerancia:</label>
+            <input type="number" step="any" name="tol" value="{{ tol }}" required>
+
+            <label for="niter">Número de iteraciones:</label>
+            <input type="number" name="niter" value="{{ niter }}" required>
+
+            <label for="x_min">Límite inferior del eje X (gráfico):</label>
+            <input type="number" name="x_min" step="any" value="{{ x_min|default:"-10" }}" required>
+
+            <label for="x_max">Límite superior del eje X (gráfico):</label>
+            <input type="number" name="x_max" step="any" value="{{ x_max|default:"10" }}" required>
+
+            <button type="submit">Calcular raíz</button>
+        </form>
+
+        {% if resultados %}
+        <div>
+            <h2>Resultado</h2>
+            {{ resultados|safe }}
+        </div>
+        {% endif %}
+
+        {% if grafico_base64 %}
+        <h2>Gráfico de la función</h2>
+        <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de la función">
+        {% endif %}
+
+        {% if historial %}
+        <hr>
+        <h2>Historial de cálculos</h2>
+        <table>
+            <tr>
+                <th>Función</th>
+                <th>Método</th>
+                <th>Tolerancia</th>
+                <th>Iteraciones</th>
+            </tr>
+            {% for item in historial %}
+            <tr>
+                <td>{{ item.funcion }}</td>
+                <td>{{ item.metodo }}</td>
+                <td>{{ item.tolerancia }}</td>
+                <td>{{ item.niter }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <form method="post" action="{% url 'index' %}">
+            {% csrf_token %}
+            <input type="hidden" name="limpiar_historial" value="1">
+            <button type="submit">Limpiar historial</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <script>
+        function mostrarCampos() {
+            const metodo = document.getElementById("metodo").value;
+            const campoAB = document.getElementById("campo_a_b");
+            const campoX0 = document.getElementById("campo_x0");
+
+            campoAB.style.display = (metodo === "biseccion") ? "block" : "none";
+            campoX0.style.display = (metodo !== "biseccion") ? "block" : "none";
+        }
+
+        window.onload = mostrarCampos;
+    </script>
+</body>
+</html>
