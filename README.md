@@ -1,5 +1,16 @@
 Este es un readme del proyecto de la calculadora. 
 
+link
+
+link de GITHUB
+
+https://github.com/Fer806-ux/Calculadora2.git
+
+link del video 
+
+https://drive.google.com/file/d/1tFfB6fiatBRB5n6Q_FYIUpYCPV4otaZp/view?usp=sharing
+
+
 coloque lo que se realizo en el proyecto paso a paso!! espero que pueda ayduarte para crear un proyecto similiar con estas instrucciones! 
 
 Documentación Paso a Paso del Proyecto Django - "holamundo"
